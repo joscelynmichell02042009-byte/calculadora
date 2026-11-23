@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculadora de Envíos</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f6f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .card {
+      background: #ffffff;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+      max-width: 420px;
+      width: 100%;
+    }
+    h1 {
+      font-size: 1.4rem;
+      color: #1e293b;
+      margin-top: 0;
+    }
+    p.desc {
+      color: #475569;
+      font-size: 0.92rem;
+      line-height: 1.4;
+    }
+    label {
+      display: block;
+      font-weight: 600;
+      margin: 1rem 0 0.4rem;
+      color: #334155;
+    }
+    input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+    button {
+      margin-top: 1rem;
+      width: 100%;
+      padding: 0.8rem;
+      background-color: #0f172a;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #1e293b;
+    }
+    .resultado {
+      margin-top: 1.2rem;
+      padding: 0.9rem;
+      border-radius: 8px;
+      font-weight: 600;
+      display: none;
+    }
+    .resultado.ok {
+      display: block;
+      background-color: #ecfdf5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+    }
+    .resultado.error {
+      display: block;
+      background-color: #fef2f2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>Calculadora de Envíos</h1>
+    <p class="desc">Envío gratis para compras iguales o superiores a <strong>100.000 COP</strong>. De lo contrario, el envío tiene un valor de <strong>8.000 COP</strong>.</p>
+    
+    <form id="form-envio" novalidate>
+      <label for="subtotal">Subtotal de la compra (COP):</label>
+      <input type="text" id="subtotal" name="subtotal" placeholder="Ej: 100000" />
+      <button type="submit">Calcular</button>
+    </form>
+
+    <div id="salida" class="resultado" role="status" aria-live="polite"></div>
+  </main>
+
+  <script type="module">
+    import { calcularEnvio } from './envios.js';
+
+    const form = document.getElementById('form-envio');
+    const input = document.getElementById('subtotal');
+    const salida = document.getElementById('salida');
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const raw = input.value.trim();
+
+      try {
+        if (raw === '') {
+          throw new TypeError('Por favor ingresa un monto válido (no puede estar vacío).');
+        }
+        const costo = calcularEnvio(raw);
+        const formateado = costo.toLocaleString('es-CO');
+        salida.className = 'resultado ok';
+        salida.textContent = `Costo de envío: ${formateado} COP${costo === 0 ? ' (¡Envío gratis!)' : ''}`;
+      } catch (err) {
+        salida.className = 'resultado error';
+        salida.textContent = `Error de validación: ${err.message}`;
+      }
+    });
+  </script>
+</body>
+</html>
